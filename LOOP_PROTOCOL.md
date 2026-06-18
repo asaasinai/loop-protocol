@@ -73,7 +73,10 @@ Fan out across projects: one worktree + one pane per project; they're independen
 Teardown a finished loop: `git worktree remove ../<project>-loop`.
 
 **Hard stops** (halt, summarize, wait for a human): ~1M tokens or ~3h wall-clock; a
-DB **migration** (schema/table/column/backfill); a missing **credential**/decision
+DB **migration** against an unconfirmed/PROD target — migrations are OK against a
+confirmed non-prod dev DB when the rule authorizes it, but PREFLIGHT first (echo the
+`DATABASE_URL` host, confirm it's the dev DB; a managed prod host = STOP); a missing
+**credential**/decision
 (→ blocked, skip the row); a write to a **read-only** system; **real outbound**
 (email/SMS/ads/social — drafting is fine, sending is not). For a compliance build,
 add: never put PHI in logs or tests.
@@ -122,8 +125,10 @@ LOOP_LOG.md. Next cycle → PLAN.
 
 ROADMAP COMPLETE → run the 360 capstone (Prompt 3).
 
-HARD STOPS: ~1M tokens / ~3h; DB migration (blocked, human sign-off); missing
-cred/decision (blocked, skip); write to a read-only system (blocked); real outbound
+HARD STOPS: ~1M tokens / ~3h; DB migration against an unconfirmed/PROD target
+(preflight the DATABASE_URL host first; dev DB authorized by the rule = OK, prod =
+blocked + human sign-off); missing cred/decision (blocked, skip); write to a
+read-only system (blocked); real outbound
 (blocked — drafting ok, sending not).
 ```
 

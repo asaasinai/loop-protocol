@@ -43,6 +43,14 @@ scaffold() {
       -e "s|{{DEPLOY}}|$deploy|g" \
       "$PROMPT_TPL" > "$wt/LOOP_PROMPT.txt"
   echo "  + LOOP_PROMPT.txt"
+
+  # DB-safety reminder: a worktree starts with NO .env.local (gitignored). If this
+  # project touches a DB, point the worktree's DATABASE_URL at a DEV DB BEFORE
+  # launching — never let the loop inherit a prod URL (it will migrate it).
+  if [ ! -f "$wt/.env.local" ] && ls "$repo"/.env* >/dev/null 2>&1; then
+    echo "  ! $name has no .env.local in the worktree. If it uses a DB, create one"
+    echo "    with a NON-PROD DATABASE_URL (dev/branch) before loop-launch.sh."
+  fi
 }
 
 run_one() {

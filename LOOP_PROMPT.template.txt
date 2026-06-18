@@ -108,8 +108,19 @@ Code rows still go through the strict TDD gate below.
 
 # HARD STOPS  (halt the loop, summarize state, do NOT continue)
 - Cumulative spend ~1M tokens this session, or wall-clock 3 hours.
-- A row requires a DATABASE MIGRATION (schema change, new table/column,
-  backfill) → row "blocked", STOP for human sign-off. Never migrate autonomously.
+- DATABASE WRITES — protect PRODUCTION above all (the safety is about the TARGET,
+  not the action):
+  * A migration/backfill against a confirmed NON-prod DB (a local/docker dev DB or
+    a branch) is FINE when the project rule authorizes it. Otherwise the default
+    holds: row "blocked", STOP for human sign-off — never migrate autonomously.
+  * PREFLIGHT — once per session, BEFORE the first migration or any write-heavy
+    test: echo the DATABASE_URL host and CONFIRM it is the project's dev DB. A
+    managed production host (neon.tech / rds / cloudsql / any prod hostname) is an
+    automatic STOP — never run a migration or write test fixtures against it —
+    UNLESS the rule names that exact prod step as deliberate + human-gated. A loop's
+    .env.local must point at its dev DB BEFORE row 1 runs; never inherit a repo's
+    prod DATABASE_URL. (This bit defacto-x: the loop migrated prod because its env
+    still held the prod URL at launch.)
 - A row needs a missing credential / external decision → row "blocked", SKIP to
   the next row (not a full stop).
 - A row would WRITE to a read-only system (Finale, Metorik) → row "blocked".
