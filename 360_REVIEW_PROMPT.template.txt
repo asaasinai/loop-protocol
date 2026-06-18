@@ -1,0 +1,40 @@
+/loop-360 Run a full 360 spec-coverage audit of {{APP}} now that the roadmap is
+complete. Goal: prove nothing in scope was missed — and separate genuine misses
+from deliberately-deferred and over-delivered work. The source specs are:
+{{SPEC_FILES}}  (e.g. the PRD, the design/handoff spec, the product brief).
+
+# 1. Map the FULL requirement surface (not just the roadmap rows)
+- Extract EVERY requirement from the specs: numbered FRs per epic/section, the
+  NFRs (perf, security, a11y, observability), domain/compliance rules, the design
+  tokens, and the UX states (empty/error/loading). Count them.
+- Also find the spec's OWN rollout / milestone / MoSCoW / cut-line section. This
+  is the scope oracle — it tells you what was supposed to ship now vs later.
+
+# 2. Audit coverage in parallel (read-only), then VERIFY every flag yourself
+- Fan out read-only agents, one per spec region, each mapping requirement →
+  code with file:line evidence, classifying DONE / PARTIAL / MISSING. Tell them to
+  be adversarial and default to PARTIAL/MISSING without proof.
+- Read-only audit agents OVER-HEDGE (they flag "not traced" for things that exist)
+  and can contradict each other. Do NOT trust their output — re-verify every
+  flagged gap yourself in the code (grep/read) and against the rollout plan before
+  it goes in the report.
+
+# 3. Classify each finding — the part that matters
+For every gap an agent flagged, decide which bucket it's really in:
+- MISS — in current-milestone scope per the rollout plan, but not built. (rare, the
+  real signal — fix these)
+- DEFERRED — the spec's own rollout puts it in a later milestone (V1.1/V2/…). NOT a
+  miss. Cite the rollout line.
+- OVER-DELIVERED — built ahead of the cut line. Note it (it's real progress).
+- INFRA / HUMAN-GATED — needs creds/BAA/infra/contract, not code.
+- POLISH — non-blocking UX/hardening.
+Also spot-check design/colors hex-by-hex vs the design spec, and flag intentional
+vs accidental divergence.
+
+# 4. Output
+A coverage report: the headline (is current-scope complete?), a milestone-coverage
+table, an over-delivery list, the genuine in-scope gaps (the short list that
+actually needs work), polish, and infra/human-gated. Write it to
+docs/SPEC_COVERAGE_360.md and publish it: `~/bin/publish-doc.mjs <md> <slug>`.
+Then, if useful, draft the forward backlog (deferred items by milestone) and any
+compliance/launch-prep list as their own docs.

@@ -1,0 +1,6 @@
+# The Loop — project registry. ONE line per project. This is the source of truth.
+# Fields:  name | repo_path | deploy | rule
+#   deploy: git | vercel-prod | vercel-deploy-prod
+#   rule:   one-line project-specific hard rule the loop must obey
+# Onboard a new project = copy this file to loops.manifest, add a line, then: bin/loop-new.sh <name>
+myapp|/home/you/myapp|vercel-prod|deploy via `vercel --prod` only; never run a DB migration autonomously

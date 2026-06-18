@@ -1,0 +1,5 @@
+# personal project registry (use loops.manifest.example as the template)
+loops.manifest
+# rendered per-project artifacts / worktrees
+LOOP_PROMPT.txt
+*-loop/
