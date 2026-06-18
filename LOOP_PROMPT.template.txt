@@ -85,6 +85,11 @@ Code rows still go through the strict TDD gate below.
 # ACT + SHIP  (Opus — you)
 - Tests green AND artifact verified → commit, open the PR, squash-merge to
   main, pull main back into this worktree branch.
+- BACK UP OFF-MACHINE (every shipped row, for redundancy): push to GitHub —
+  `git push origin --all --follow-tags`, or run `~/playbooks/bin/loop-backup.sh
+  {{APP}}` (it ensures a private remote exists + scans for secrets first). Never
+  leave a shipped row living only on local. (A 15-min cron also backs this up, but
+  push on ship — don't wait for it.)
 - SHIP per {{DEPLOY}}:
     git                → run the project's build/publish script so the live
                          deploy (smashforms / deploy dir) is refreshed.
