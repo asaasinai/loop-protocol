@@ -53,5 +53,19 @@ bin/loop-new.sh <project>
 bin/loop-status.sh
 ```
 
+## Worked example
+
+See **[`examples/`](examples/)** for a filled-in `ROADMAP.example.md` (good rows
+across every status — testable acceptance, one-PR-each) and a matching
+`LOOP_LOG.example.md` ledger that shows what each cycle's audit line looks like.
+
+## Contributing
+
+See **[`CONTRIBUTING.md`](CONTRIBUTING.md)** — the protocol gets better every time a
+loop teaches us something. The rule: a lesson with no prompt change is just a story;
+wire the fix into the prompt.
+
+---
+
 The whole thing is provider-agnostic — the prompts work with any capable coding
 agent that can spawn subagents, run a shell, and edit files.
