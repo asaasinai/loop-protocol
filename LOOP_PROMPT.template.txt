@@ -111,7 +111,31 @@ Code rows still go through the strict TDD gate below.
   scope, not misses — cite the rollout line. Publish the report to smashforms; for
   a real product also draft the forward backlog + any compliance/launch-prep list.
 
-# HARD STOPS  (halt the loop, summarize state, do NOT continue)
+# HANDOFF  (write HANDOFF.md whenever the loop stops — completion, hard stop, or
+#           a pile-up of blocked/failed rows a human must clear)
+- A dev who clones this branch gets the CODE from git. HANDOFF.md must carry the
+  things git does NOT: the why, the dead-ends, the run/deploy gotchas, and what to
+  do next. Do NOT restate the diff or the commit log — point at them.
+- Write `HANDOFF.md` in the repo root, then commit + push it with the branch
+  (loop-backup.sh / git push) so it travels off-machine. Sections:
+  * STATE — counts (done/in_progress/blocked/failed) + every blocked/failed row
+    listed with its one-line WHY (the reason from Notes). What works, what's stubbed.
+  * LAND HERE — branch (loop/{{APP}}), worktree path, last sha, and the exact way
+    to get this tree (git fetch + checkout the branch / worktree add).
+  * RUN IT — env setup (which .env, the dev-DB host — NOT a prod URL), install, the
+    test command, dev/build command, and the deploy command for {{DEPLOY}} incl. its
+    trap (e.g. vercel-prod = `vercel --prod`, NOT a git push).
+  * WHY / DECISIONS — the non-obvious calls made this session and any approaches
+    TRIED AND ABANDONED (so the dev doesn't re-walk them). This is the part that
+    never makes it into commits.
+  * GOTCHAS — the project rule ({{RULE}}), plus traps hit this session (stale .next
+    cache, sslmode=no-verify for the local DB, a flaky step, etc.).
+  * NEXT ACTIONS — ordered punch-list a human picks up: unblock steps for each
+    blocked row first, then the remaining todo rows. Say what to do FIRST.
+- If a 360 capstone ran, link its SPEC_COVERAGE_360.md from NEXT ACTIONS rather than
+  duplicating it. Keep HANDOFF.md current — overwrite it on each stop, don't append.
+
+# HARD STOPS  (halt the loop, write HANDOFF.md, summarize state, do NOT continue)
 - Cumulative spend ~1M tokens this session, or wall-clock 3 hours.
 - DATABASE WRITES — protect PRODUCTION above all (the safety is about the TARGET,
   not the action):

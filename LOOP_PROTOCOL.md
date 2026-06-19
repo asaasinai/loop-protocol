@@ -27,6 +27,9 @@ doc (the prompts are inline at the bottom; copy-paste them).
    stub it. Drafting outbound is fine; **sending is not**.
 5. **Verify reality, not reports.** Green tests, a subagent's "done", and a passing
    build summary are all *claims*. The loop only advances on first-hand evidence.
+6. **A stop is a handoff.** Whenever the loop halts, it leaves a `HANDOFF.md` so a
+   human dev can take over cold. git carries the code; the handoff carries what git
+   can't — the why, the dead-ends, the run/deploy gotchas, and the next-actions.
 
 ---
 
@@ -124,6 +127,16 @@ confirm. Set the row "done" (sha + shipped+verified) and append one line to
 LOOP_LOG.md. Next cycle → PLAN.
 
 ROADMAP COMPLETE → run the 360 capstone (Prompt 3).
+
+HANDOFF (whenever the loop stops — completion, hard stop, or a pile-up of blocked
+rows): write HANDOFF.md in the repo root and commit+push it with the branch. git
+already gives a dev the code; HANDOFF.md carries what git does NOT — STATE (row
+counts + each blocked/failed row's one-line why), LAND HERE (branch, worktree path,
+last sha, how to fetch it), RUN IT (env/dev-DB host, test + build + deploy command
+incl. its trap), WHY/DECISIONS (non-obvious calls + approaches tried-and-abandoned
+this session), GOTCHAS (project rule + traps hit), and an ordered NEXT ACTIONS
+punch-list (unblock steps first, then todo rows). Don't restate the diff; overwrite
+HANDOFF.md on each stop, don't append.
 
 HARD STOPS: ~1M tokens / ~3h; DB migration against an unconfirmed/PROD target
 (preflight the DATABASE_URL host first; dev DB authorized by the rule = OK, prod =

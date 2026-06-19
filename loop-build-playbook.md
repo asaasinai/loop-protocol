@@ -87,6 +87,32 @@ rows done" doesn't get mistaken for "the spec is met." Prompt:
 
 ---
 
+## Handing off to a dev (HANDOFF.md)
+
+Whenever the loop **stops** — roadmap complete, a hard stop, or a pile-up of blocked
+rows a human must clear — it writes a `HANDOFF.md` in the repo root, committed and
+pushed with the branch. The point: a dev who clones the branch already has the code
+and commit log from git, so HANDOFF.md only carries **what git can't** —
+
+- **STATE** — row counts (done/in_progress/blocked/failed) + each blocked/failed row
+  with its one-line *why*; what works, what's stubbed.
+- **LAND HERE** — branch, worktree path, last sha, how to fetch the tree.
+- **RUN IT** — env/dev-DB host (never a prod URL), install, test cmd, build/dev cmd,
+  and the deploy command for this project's method *with its trap* (e.g. `vercel --prod`,
+  not a git push).
+- **WHY / DECISIONS** — the non-obvious calls + any approaches **tried and abandoned**
+  this session, so the dev doesn't re-walk them. This never lands in commits.
+- **GOTCHAS** — the project rule + traps hit this session (stale `.next`, local-DB
+  `sslmode=no-verify`, a flaky step).
+- **NEXT ACTIONS** — an ordered punch-list: unblock steps for each blocked row first,
+  then the remaining todo rows; say what to do *first*.
+
+Don't restate the diff; link the 360 report if one ran; overwrite (don't append) on
+each stop. This is the bridge between an autonomous loop and a human picking it up —
+and unlike a live-session share, it works headless and rides along with the git push.
+
+---
+
 ## TL;DR — how to run it
 
 ```bash
@@ -102,7 +128,7 @@ cd ~/<project>-loop
 # 3. repeat per project in its own pane. They run fully in parallel.
 ```
 
-Hard stops are baked in: **1M tokens, 3 hours, or any DB migration** halts the loop and waits for you.
+Hard stops are baked in: **1M tokens, 3 hours, or any DB migration** halts the loop and waits for you. On any stop it leaves a **HANDOFF.md** so you (or a dev) can pick it up cold.
 
 ---
 
