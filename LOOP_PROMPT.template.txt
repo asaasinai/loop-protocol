@@ -19,6 +19,59 @@ calling an API; do that work, don't stub it.
 - Publish a doc/spec to smashforms: `~/bin/publish-doc.mjs <md> <slug>`.
 Code rows still go through the strict TDD gate below.
 
+# SPEC CHECK  (Opus — the FIRST gate, before anything else; this is the one place
+#              the loop is allowed to pause and ask)
+- A build with no locked spec is a build full of guesses. Before PLAN, establish
+  whether {{APP}} HAS a spec to build against.
+- LOOK FOR A SPEC, in this order:
+  * the BIBLE/PRD/spec the project rule names (e.g. a SPEC.md / PLATFORM_SPEC.md /
+    docs/specs/ / a security-findings JSON) — if the rule above points at one, that
+    IS the spec; treat it as the source of truth.
+  * else specs/{{APP}}-spec.md in this worktree.
+  * else any obvious existing spec in the repo (PRD/SPEC/BUILD_LIST with real,
+    numbered scope).
+- WHETHER OR NOT A SPEC EXISTS, this gate ALWAYS ASKS Marshall ONCE before building
+  (the deliberate front-door gate — not mid-build chatter). A spec being present is
+  not a reason to skip the question: an existing spec can still have gaps, stale
+  scope, or unresolved open questions, and the spec engine can be run to CLOSE them.
+
+- IF A SPEC EXISTS → first do a fast GAP SCAN (don't rewrite it, just assess it):
+  read the spec and check it against its archetype's required coverage and the
+  project's current reality — e.g. missing modules for its archetype (CORE always;
+  SYSTEM for A/B; AGENT incl. the Eval Suite for B/C), an OPEN QUESTIONS section with
+  unresolved build-blockers, no Build Plan, scope that's drifted from the repo/rule,
+  or thin/ambiguous areas a builder would have to guess at. Then ASK:
+    "Spec found for {{APP}} at <path>. Gap scan: <one-line list of gaps, or 'looks
+     complete'>. Run the SPEC ENGINE in gap-closing mode to tighten it, or build
+     against it as-is?"
+  * "close gaps" → run ~/playbooks/SPEC_ENGINE_PROMPT.template.txt in GAP-CLOSING
+    mode: load the existing spec, confirm/adjust its archetype, and run ONLY the
+    discovery needed to resolve the listed gaps + open questions (focused batches,
+    pull from memory+repo first, ask only build-blockers). Amend the spec in place,
+    re-run its LOCK CHECK, then continue. Don't redo settled sections.
+  * "build as-is" → the spec is the SINGLE SOURCE OF TRUTH as written; continue.
+- IF NO SPEC EXISTS → ASK:
+    "No locked spec found for {{APP}}. Run the SPEC ENGINE first
+     (triage A/B/C → discovery → a locked specs/{{APP}}-spec.md), or proceed
+     roadmap-only for a small/throwaway build?"
+  * "run the spec engine" (default for anything non-trivial) → run the discovery
+    framework at ~/playbooks/SPEC_ENGINE_PROMPT.template.txt for {{APP}}: triage the
+    archetype, run only the modules that archetype needs, pull what you can from the
+    project's memory + repo and ask only the genuinely build-blocking unknowns in
+    focused batches, then WRITE the archetype-matched spec to specs/{{APP}}-spec.md
+    and run its LOCK CHECK. Do NOT advance past a build-blocking unknown.
+  * "proceed roadmap-only" → build straight off ROADMAP.md as a non-spec-driven
+    loop (artifact-verify still applies; the FR-by-FR verifier just doesn't).
+
+- ONCE THE SPEC IS SETTLED (locked as-is or gap-closed): it is the SINGLE SOURCE OF
+  TRUTH. Roadmap rows map to its scope; rows tied to its numbered acceptance/FRs are
+  SPEC-DRIVEN (the adversarial spec-verifier in VERIFY is mandatory for them); its
+  rollout/milestone section is the scope oracle for the 360. Refresh/redraft
+  ROADMAP.md from the Build Plan if the spec changed, then continue to RESUME / PLAN.
+  (You can also run any of this ahead of time with `/loop-spec {{APP}}`.)
+- After this gate is settled, the loop is autonomous — no more asking; mid-build
+  ambiguity is a SPEC DEFECT (amend the spec + re-lock), never a build-time guess.
+
 # RESUME CHECK  (Opus — first turn only, before PLAN)
 - If this worktree already has work in it (a row mid-flight, uncommitted changes),
   establish state BEFORE doing anything new: read LOOP_LOG.md + the roadmap to see

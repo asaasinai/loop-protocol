@@ -36,6 +36,15 @@ scaffold() {
   fi
   [ -f "$wt/LOOP_LOG.md" ] || { printf '# %s loop log\n' "$name" > "$wt/LOOP_LOG.md"; }
 
+  # specs/ — the spec engine writes specs/<name>-spec.md here. Create the dir but
+  # never fabricate a spec; the loop's SPEC CHECK decides spec vs roadmap-only.
+  mkdir -p "$wt/specs"
+  if ls "$wt"/specs/*.md >/dev/null 2>&1; then
+    echo "  = spec present in specs/ (loop will build against it)"
+  else
+    echo "  + specs/ (empty — run /loop-spec $name to triage + lock a spec, or build roadmap-only)"
+  fi
+
   # LOOP_PROMPT.txt — always re-render from template (cheap, keeps rule fresh)
   sed -e "s|{{APP}}|$name|g" \
       -e "s|{{ROADMAP}}|ROADMAP.md|g" \

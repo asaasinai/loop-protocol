@@ -1,17 +1,35 @@
 # The Loop Protocol (v2) — team edition
 
 A self-contained guide to running an autonomous **build-and-SHIP loop**: a
-self-driving `/loop` that walks a project's roadmap row by row, specs each row,
-builds it test-first, verifies the real result, and ships it — then does a 360
-spec-coverage review when the roadmap is done. Everything you need is in this one
-doc (the prompts are inline at the bottom; copy-paste them).
+self-driving `/loop` that — once it has a locked spec to build against — walks a
+project's roadmap row by row, specs each row, builds it test-first, verifies the
+real result, and ships it, then does a 360 spec-coverage review when the roadmap is
+done. Everything you need is in this one doc (the prompts are inline at the bottom;
+copy-paste them).
 
-**Per row:** PLAN → DO → CHECK → VERIFY → ACT+SHIP. **At the end:** a 360 review.
+**At loop start:** SPEC CHECK (build against an existing spec, or run the spec
+engine). **Per row:** PLAN → DO → CHECK → VERIFY → ACT+SHIP. **At the end:** a 360
+review.
 
 ---
 
 ## Core ideas
 
+0. **Spec before build (the front gate).** Ambiguity at build time is always a spec
+   defect, never a build decision. So the loop's FIRST move is SPEC CHECK, and it
+   ALWAYS pauses ONCE to ask here — a spec being present does not skip the question,
+   because an existing spec can still have gaps, stale scope, or unresolved open
+   questions. If a spec exists (the BIBLE/PRD the rule names, or `specs/<app>-spec.md`),
+   the loop gap-scans it and offers to run the **spec engine** in *gap-closing mode*
+   to tighten it, or build as-is. If there is none, it offers to run the engine to
+   create one (or build roadmap-only for a throwaway). The engine —
+   `~/playbooks/SPEC_ENGINE_PROMPT.template.txt` — triages the build into an archetype
+   (A Standalone System · B Agent-Driven · C Agents Only), runs only the discovery
+   modules that archetype needs (CORE / SYSTEM / AGENT), and emits/amends the matching
+   spec (System / Hybrid / Agent), then LOCKs it. Run any of this ahead of time with
+   `/loop-spec <proj>`. This is the only place the loop is allowed to ask; once the
+   spec is settled it is autonomous. For B/C the **Eval Suite** is the acceptance
+   gate — "done" = the eval pass-rate, not "it ran once."
 1. **Roadmap = source of truth.** A `ROADMAP.md` table in the repo. The loop owns
    the `Status` column (`todo · in_progress · done · blocked · failed`). One row =
    one tight, testable spec = one PR. Opus's first job is to say *no* to scope creep.

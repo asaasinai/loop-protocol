@@ -169,10 +169,11 @@ renders it per project, substituting `{{APP}}`, `{{ROADMAP}}`, `{{RULE}}`, and
 To read the current prompt for any project, open its rendered `LOOP_PROMPT.txt`
 in the worktree.
 
-The five-phase cycle the prompt drives:
+The cycle the prompt drives (a SPEC gate at start, then five phases per row):
 
 | Phase | Who | What |
 |---|---|---|
+| **SPEC CHECK** | Opus | *Once, at loop start — the only place the loop may ask, and it ALWAYS asks.* Find a spec (the BIBLE/PRD the rule names, or `specs/<app>-spec.md`). **If one exists → gap-scan it** (missing archetype modules, unresolved open questions, no Build Plan, scope drift) and ask: run the **spec engine** in gap-closing mode to tighten it, or build as-is. **If none →** ask: run the engine to create one (triage A/B/C → CORE/SYSTEM/AGENT modules → archetype-matched spec → LOCK), or roadmap-only. Once settled, the spec is source of truth and rows map to it (spec-driven rows get the adversarial verifier). Run any of this ahead with `/loop-spec <proj>`. Then continue to PLAN. |
 | **PLAN** | Opus | Claim the first non-terminal roadmap row; write a tight, self-contained, TDD spec — including any tools the row needs (web/MCP/media/publish) and the **real artifact** it must produce. |
 | **DO** | Sonnet | Build exactly the spec, test-first. Uses the full tool surface (loads MCP/web schemas via ToolSearch) when the row needs live data, an asset, or an API call. Returns diff + test output + artifact paths. |
 | **CHECK** | Opus | **Confirm the subagent actually did the work** (`git status`, files exist, test count moved — never trust its self-report), then run the full suite + new tests + linter/build *yourself*. Stale-cache false failures → clear & re-run. Two strikes back to Sonnet → else row `failed`. |
@@ -265,29 +266,35 @@ project is **add one line, run two commands.** Nothing is re-derived by hand.
 | `loop-status.sh` | the board — per-project todo/in_progress/done/failed/blocked counts + last log line |
 | `loop-cleanup.sh <proj>` | tears down a finished worktree + branch (warns on unmerged commits) |
 
-**The judgment step** stays with Claude: `/loop-roadmap <proj>` drafts real, testable
-roadmap rows from the project's current state (memory, BUILD_LIST, security JSON, repo).
+**The judgment steps** stay with Claude: `/loop-spec <proj>` triages the build and
+produces a LOCKED spec (skip when the project already has a BIBLE/PRD the rule
+names); `/loop-roadmap <proj>` drafts real, testable roadmap rows from that spec (or,
+roadmap-only, from the project's current state — memory, BUILD_LIST, security JSON,
+repo).
 
-### The 6-step cycle (same every time)
+### The cycle (same every time)
 
 ```bash
 # 1. register — add a line to ~/playbooks/loops.manifest
-# 2. scaffold
+# 2. scaffold (now also creates specs/ in the worktree)
 ~/playbooks/bin/loop-new.sh <proj>
-# 3. fill the roadmap (in Claude Code)
+# 3. SPEC (in Claude Code) — triage + lock a spec, UNLESS one already exists
+/loop-spec <proj>             # archetype triage → discovery → specs/<proj>-spec.md → LOCK
+#    (skip for a small/throwaway build; the loop's SPEC CHECK will offer it anyway)
+# 4. fill the roadmap (in Claude Code) — rows map to the locked spec's Build Plan
 /loop-roadmap <proj>          # then eyeball the rows, prune scope creep
-# 4. launch
+# 5. launch
 ~/playbooks/bin/loop-launch.sh <proj>     # or --all to fan out
 #    attach, press  prefix + ]  in each pane to paste the loop prompt, Enter
-# 5. watch
+# 6. watch
 ~/playbooks/bin/loop-status.sh
-# 6. teardown when the roadmap is all done/blocked
+# 7. teardown when the roadmap is all done/blocked
 ~/playbooks/bin/loop-cleanup.sh <proj>
 ```
 
-Fan everything out at once: `loop-new.sh --all` → `/loop-roadmap` each →
-`loop-launch.sh --all`. The split — deterministic plumbing in shell, judgment in
-Claude — is what makes it repeatable instead of a one-off paste.
+Fan everything out at once: `loop-new.sh --all` → `/loop-spec` (where needed) →
+`/loop-roadmap` each → `loop-launch.sh --all`. The split — deterministic plumbing in
+shell, judgment in Claude — is what makes it repeatable instead of a one-off paste.
 
 ## Operating it
 
