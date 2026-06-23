@@ -3,3 +3,5 @@ loops.manifest
 # rendered per-project artifacts / worktrees
 LOOP_PROMPT.txt
 *-loop/
+# backup run log (leaks private repo names — never commit to public repo)
+loop-backup.log
