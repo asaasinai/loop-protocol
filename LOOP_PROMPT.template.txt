@@ -80,6 +80,16 @@ Code rows still go through the strict TDD gate below.
   lost. Only then continue. Never build on top of an unknown/red tree.
 
 # PLAN  (Opus — you, the main session)
+- READ PRIOR LESSONS FIRST — before you spec anything. Read LOOP_LOG.md's
+  "## Attempts & lessons" section in full, plus any of Marshall's memory on this box
+  that applies (~/.claude/projects/-home-marshall/memory/ — the MEMORY.md index, this
+  project's own memory file, and tool_loop_playbook.md's accumulated harness gotchas,
+  if the path exists). NEVER re-attempt an approach a prior cycle already recorded as
+  failed; form a hypothesis the log doesn't already rule out. If a recorded gotcha
+  applies to this row (a deploy trap, an env/DB quirk, a framework reflex), apply the
+  fix UPFRONT instead of rediscovering it the hard way. This read is the whole point
+  of the journal — a loop that reads its history builds on it; one that doesn't
+  repeats it.
 - Read the roadmap. Find the FIRST row whose Status is not done/blocked/failed/
   in_progress. Set it to "in_progress" immediately (claim it) — prevents a
   parallel loop grabbing the same row.
@@ -111,7 +121,15 @@ Code rows still go through the strict TDD gate below.
   suspect a stale build cache — clear it (e.g. rm -rf .next) and re-run before
   believing the failure.
 - Anything fails → hand the failure output back to Sonnet to fix, re-run. At
-  most TWICE. Still failing → row "failed", reason in Notes, park the WIP, move
+  most TWICE. BEFORE each retry, and again on a final fail/block, append a LESSON
+  to LOOP_LOG.md's "## Attempts & lessons" — three lines:
+    Tried:  <the approach you just took>
+    Result: <what actually happened — the real error, not "it failed">
+    Lesson: <the cause + the symptom a future cycle pattern-matches on next time>
+  The Lesson line is the whole value; "tried X, failed" without the cause is a diary,
+  not a guide, and the next cycle can't use it. Don't make the next retry (or the next
+  session's RESUME) re-walk a dead end you already mapped.
+- Still failing after two tries → row "failed", reason in Notes, park the WIP, move
   on to the next row.
 
 # VERIFY THE ARTIFACT  (Opus — you)  ← never skip. green tests ≠ working thing.
@@ -151,9 +169,11 @@ Code rows still go through the strict TDD gate below.
 - VERIFY LIVE: curl / WebFetch the deployed URL (or stat the deploy-dir file)
   and confirm the new behavior is actually present in production. Deploy fails →
   row "blocked: deploy", KEEP the merge, note it, move on.
-- Set the row "done" with the sha + "shipped+verified" in Notes. Append one
-  line to LOOP_LOG.md: timestamp, row #, outcome, sha, deploy result, approx
-  tokens. Start the next cycle from PLAN.
+- Set the row "done" with the sha + "shipped+verified" in Notes. Append one line
+  to LOOP_LOG.md's "## Outcome ledger": timestamp, row #, outcome, sha, deploy
+  result, approx tokens. (LOOP_LOG.md has TWO append-only sections — this one-line
+  outcome ledger, and the "## Attempts & lessons" journal the CHECK step writes.
+  Both are append-only; never overwrite, only add.) Start the next cycle from PLAN.
 
 # ROADMAP COMPLETE → 360 CAPSTONE  (when every row is done/blocked/failed)
 - Don't just stop — run a full 360 spec-coverage audit (see
@@ -163,6 +183,16 @@ Code rows still go through the strict TDD gate below.
   OVER-DELIVERED vs INFRA/human-gated vs POLISH. Most "gaps" are usually deferred
   scope, not misses — cite the rollout line. Publish the report to smashforms; for
   a real product also draft the forward backlog + any compliance/launch-prep list.
+- PROMOTE CROSS-CUTTING LESSONS. Scan this session's "## Attempts & lessons" for any
+  lesson that is NOT specific to this one build — a reusable codebase/tooling/deploy
+  reflex, an env/DB gotcha, a framework quirk, or a loop-HARNESS fix. Promote each to
+  Marshall's long-term memory so it doesn't die in one project's log: a harness/process
+  lesson → fold into ~/playbooks (the relevant template) + note it on the
+  tool-loop-playbook memory; a project- or general-reflex lesson → write a memory file
+  + a MEMORY.md pointer under ~/.claude/projects/-home-marshall/memory/. Per-build
+  trivia stays in LOOP_LOG. The LOOP_LOG journal is SHORT-TERM (this task); the memory
+  stack is LONG-TERM (every task) — do NOT fork a parallel lessons.md, the memory stack
+  already IS that, richer (linked + recall-indexed).
 
 # HANDOFF  (write HANDOFF.md whenever the loop stops — completion, hard stop, or
 #           a pile-up of blocked/failed rows a human must clear)

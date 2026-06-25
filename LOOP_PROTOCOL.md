@@ -48,6 +48,15 @@ review.
 6. **A stop is a handoff.** Whenever the loop halts, it leaves a `HANDOFF.md` so a
    human dev can take over cold. git carries the code; the handoff carries what git
    can't — the why, the dead-ends, the run/deploy gotchas, and the next-actions.
+7. **The loop learns, it doesn't just log.** `LOOP_LOG.md` is two append-only
+   sections: an **outcome ledger** (one line per shipped row) AND an **Attempts &
+   lessons** journal. On every retry/fail/blocked row the loop writes a three-line
+   lesson — *Tried · Result · Lesson (the cause + the symptom to watch for)* — and
+   **PLAN reads the journal first, every cycle**, so it never re-walks a dead end. The
+   journal is short-term (this task). When the 360 finds a lesson that's *cross-cutting*
+   (a deploy/env/framework reflex or a harness fix), it's **promoted to long-term
+   memory** — the playbook templates + the memory stack — not a parallel `lessons.md`.
+   A loop that reads its own history builds on it; one that doesn't repeats it.
 
 ---
 
@@ -118,10 +127,12 @@ RESUME CHECK (first turn only): if work is already in flight, read LOOP_LOG.md +
 ROADMAP.md, run the full test suite + build, confirm green, and commit any
 green-but-uncommitted WIP BEFORE continuing. Never build on an unknown/red tree.
 
-PLAN (you, Opus): claim the first non-terminal row (set it in_progress). Write a
-TIGHT, self-contained, TEST-FIRST spec for that ONE row — files, the exact tests,
-any tools to call, and the REAL artifact it must produce. The spec is the whole
-handoff; the builder sees none of your context.
+PLAN (you, Opus): READ PRIOR LESSONS FIRST — LOOP_LOG.md's "## Attempts & lessons"
+journal + any project/harness memory available (never re-try an approach already
+recorded failed; apply known gotchas upfront). Then claim the first non-terminal row
+(set it in_progress) and write a TIGHT, self-contained, TEST-FIRST spec for that ONE
+row — files, the exact tests, any tools to call, and the REAL artifact it must
+produce. The spec is the whole handoff; the builder sees none of your context.
 
 DO (delegate to Sonnet): spawn a subagent with the spec verbatim (see Prompt 4).
 Failing tests first, then code to pass them, nothing outside the spec. It returns
@@ -131,7 +142,10 @@ CHECK (you): FIRST confirm the subagent actually did the work — git status, fi
 exist, test count went up. Do not trust its self-report (a subagent can claim done
 with nothing on disk). Then run the FULL suite + linter/build YOURSELF. A
 route-not-found on a prod build that looks impossible = suspect a stale cache; clear
-it and re-run. Fail → back to Sonnet, max twice, else row "failed".
+it and re-run. Fail → back to Sonnet, max twice. Before each retry and on a final
+fail/block, append a 3-line LESSON to LOOP_LOG.md ("## Attempts & lessons"):
+Tried / Result / Lesson (cause + symptom for next time) — the Lesson line is the
+point. Still failing → row "failed".
 
 VERIFY (you): RUN the thing and assert the real artifact (file non-empty, rows>0,
 URL 200, expected status codes incl. 403 on unauthorized). For spec-driven rows,
@@ -142,7 +156,8 @@ tracked background task / verify against a clean build && start.)
 ACT + SHIP (you): tests green AND artifact verified → commit, PR, squash-merge to
 main, pull back. Ship per deploy method, then curl/stat the live URL/file to
 confirm. Set the row "done" (sha + shipped+verified) and append one line to
-LOOP_LOG.md. Next cycle → PLAN.
+LOOP_LOG.md's outcome ledger (both LOOP_LOG sections are append-only — never
+overwrite). Next cycle → PLAN.
 
 ROADMAP COMPLETE → run the 360 capstone (Prompt 3).
 
@@ -194,6 +209,10 @@ RETURN: `criterion | PASS/FAIL | evidence`, then a GAPS section of every FAIL.
    Spot-check design tokens hex-by-hex; flag intentional vs accidental divergence.
 4. Write docs/SPEC_COVERAGE_360.md and publish it. For a product, also draft the
    forward backlog (deferred by milestone) + any compliance/launch-prep list.
+5. PROMOTE cross-cutting lessons from this run's "## Attempts & lessons" — any
+   reusable deploy/env/framework reflex or harness fix — into long-term memory (the
+   playbook templates + the memory stack). Per-build trivia stays in LOOP_LOG; don't
+   fork a parallel lessons.md.
 ```
 
 ## Prompt 4 — module spec (delegated build subagent)

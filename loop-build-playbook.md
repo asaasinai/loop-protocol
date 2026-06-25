@@ -300,6 +300,7 @@ shell, judgment in Claude — is what makes it repeatable instead of a one-off p
 
 - **Start small:** run the loop on ONE project end-to-end, watch one full PLAN→ACT cycle merge, then fan out.
 - **Fan out:** one tmux pane per project, each in its worktree. They're independent.
-- **Audit:** `LOOP_LOG.md` per worktree gives you the per-cycle ledger; the Status column gives you the live board.
+- **Audit:** `LOOP_LOG.md` per worktree has two append-only sections — an **outcome ledger** (one line per shipped row) and an **Attempts & lessons** journal (3-line `Tried / Result / Lesson` entries written on every retry/fail/block). The Status column gives you the live board.
+- **It learns:** `PLAN` reads the lessons journal first every cycle, so the loop never re-walks a dead end it already mapped — within a session or across resumes. At the 360 capstone, lessons that are *cross-cutting* (a deploy/env/framework reflex, a harness fix) get promoted to long-term memory (the playbook templates + the memory stack); per-build trivia stays in `LOOP_LOG`. The journal is short-term memory of the task; the memory stack is long-term memory of the codebase — they are not the same file.
 - **Resume:** a loop that hit a hard stop can be re-run later — it picks up at the first non-terminal row.
 ```

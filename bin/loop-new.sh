@@ -34,7 +34,7 @@ scaffold() {
     sed "s/{APP}/$name/g" "$ROADMAP_TPL" > "$wt/ROADMAP.md"
     echo "  + ROADMAP.md (blank — run /loop-roadmap $name to fill it)"
   fi
-  [ -f "$wt/LOOP_LOG.md" ] || { printf '# %s loop log\n' "$name" > "$wt/LOOP_LOG.md"; }
+  [ -f "$wt/LOOP_LOG.md" ] || { printf '# %s loop log\n\n## Outcome ledger\n<!-- one line per shipped row: timestamp | row# | outcome | sha | deploy | ~tokens -->\n\n## Attempts & lessons\n<!-- append-only. on any retry/fail/blocked row, log 3 lines:\n     Tried: <approach>  Result: <what happened>  Lesson: <cause + symptom to watch for>.\n     PLAN reads this first every cycle — never re-try an approach already recorded failed. -->\n' "$name" > "$wt/LOOP_LOG.md"; }
 
   # specs/ — the spec engine writes specs/<name>-spec.md here. Create the dir but
   # never fabricate a spec; the loop's SPEC CHECK decides spec vs roadmap-only.
