@@ -149,9 +149,14 @@ point. Still failing → row "failed".
 
 VERIFY (you): RUN the thing and assert the real artifact (file non-empty, rows>0,
 URL 200, expected status codes incl. 403 on unauthorized). For spec-driven rows,
-also run an adversarial spec-verifier (Prompt 2) until every criterion PASSes.
-Can't produce it (missing data/cred) → "blocked". (Dev server reaped? run it as a
-tracked background task / verify against a clean build && start.)
+also run an adversarial spec-verifier (Prompt 2) until every criterion PASSes. For
+rows producing a PUBLIC marketing/landing/portfolio surface (NOT dashboards/data UI),
+also run the anti-slop design PRE-FLIGHT as a gate — a subagent scores the rendered
+output against the mechanical checklist (zero em-dashes in UI text, eyebrow count ≤
+ceil(sections/3), no 3 consecutive zigzags, hero subtext ≤ 20 words, one accent, one
+radius scale, real images not div-fakes, WCAG-AA contrast), default FAIL, fix until
+clean. Can't produce it (missing data/cred) → "blocked". (Dev server reaped? run it as
+a tracked background task / verify against a clean build && start.)
 
 ACT + SHIP (you): tests green AND artifact verified → commit, PR, squash-merge to
 main, pull back. Ship per deploy method, then curl/stat the live URL/file to

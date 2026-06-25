@@ -149,6 +149,19 @@ Code rows still go through the strict TDD gate below.
   paste the criteria + how to exercise the build; it returns PASS/FAIL+evidence
   per criterion, defaulting to FAIL. Any FAIL → fix the gap, re-verify, until the
   whole list is PASS. This is the gate for anything with a real spec behind it.
+- DESIGN-SLOP rows (a row producing a PUBLIC marketing / landing / portfolio /
+  brand surface — NOT a dashboard, data table, or admin/product UI): also run the
+  anti-slop PRE-FLIGHT as an acceptance gate. Spawn a subagent (sonnet) with the
+  mechanical checklist at ~/.openclaw/skills/taste-skill/SKILL.md (Section 14 FINAL
+  PRE-FLIGHT CHECK; the full ruleset is the rest of that file) + the rendered output
+  (the built HTML and, if you can capture them, screenshots): it returns each box
+  PASS/FAIL with evidence, defaulting to FAIL. The checks are mechanical and countable
+  — zero em-dashes in rendered UI text, eyebrow count ≤ ceil(sections/3), no 3
+  consecutive zigzag sections, hero subtext ≤ 20 words, one accent color, one radius
+  scale, real images (not div-fake screenshots), WCAG-AA button/form contrast. Any
+  FAIL → fix, re-verify, until clean. (Skip the landing-specific rows for any
+  data-dense/dashboard surface; only the a11y/contrast + design-system rows apply
+  there. The em-dash ban is for rendered UI text only, never the repo's prose/docs.)
 - Runtime-verify gotchas: a dev server spawned inside a tool call can get reaped —
   run it as a tracked background task and poll for ready, or verify against a
   clean production start (npm build && start), not a stale dev server.
