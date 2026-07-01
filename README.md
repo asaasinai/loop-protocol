@@ -27,6 +27,16 @@ roadmap is done.
 | [`MODULE_SPEC.template.txt`](MODULE_SPEC.template.txt) | Handoff spec for a delegated build subagent. |
 | [`ROADMAP.template.md`](ROADMAP.template.md) | The roadmap table (loop's source of truth). |
 
+## Worked examples (`examples/`)
+
+Copy the *shape and the devices*, not the content.
+
+| File | Shows |
+|------|-------|
+| [`examples/SPEC.example.md`](examples/SPEC.example.md) | A small archetype-A spec demonstrating every actionable device **D1–D9** (Status Header, Priority Ladder, Non-Goals, Invariants INV#, per-phase Definition of Done, Dev Task List T#, Seed Dataset, Backlog). What a lockable, loop-buildable spec looks like. |
+| [`examples/ROADMAP.example.md`](examples/ROADMAP.example.md) | Rows sourced 1:1 from the spec's Dev Tasks, citing `T#`/`INV#`. |
+| [`examples/LOOP_LOG.example.md`](examples/LOOP_LOG.example.md) | The two-section outcome ledger + attempts/lessons journal. |
+
 ## Scaffolding scripts (`bin/`)
 
 Deterministic plumbing; judgment stays with the agent.

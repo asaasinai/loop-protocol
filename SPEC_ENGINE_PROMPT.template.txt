@@ -78,6 +78,12 @@ C2 USERS & STAKEHOLDERS
 C3 SCOPE, PHASING & RISK
 - What's explicitly IN for v1 vs. deferred?  Riskiest assumption / failure mode?
 - Build vs. buy for any component?
+C4 INVARIANTS, PRIORITIES & NON-GOALS  (feeds the actionable devices below)
+- What must this system NEVER do / NEVER violate? (→ named INVARIANTS, D4). Include
+  the core security/permission boundaries as invariants, not just a role matrix.
+- When two goods conflict mid-build (correctness vs. speed, integrity vs. simplicity),
+  what's the priority ORDER the builder should resolve by? (→ PRIORITY LADDER, D2).
+- What is this explicitly NOT — features/scope you do NOT want built now? (→ NON-GOALS, D3).
 
 ==================================================
 MODULE: SYSTEM  (run for A and B)
@@ -92,6 +98,12 @@ S3 TECHNICAL CONSTRAINTS & NON-FUNCTIONALS — scale at launch and 12mo; perform
    reliability (uptime, backup/restore); stack/hosting constraints, team skills.
 S4 UX / UI — platforms; design language / brand constraints; key screens + the
    primary action on each; states (empty/loading/error/success); accessibility.
+S5 SEED DATA & DATA CLASSES  (feeds the actionable devices below)
+- What REAL data seeds v1 — core entities, rough counts, and where the records come
+  from (authored / imported / sample)? (→ SEED DATASET, D7). Enough that the build
+  can load it and prove rows>0, not stub it.
+- Which data is IMMUTABLE (write-once / audit / versioned) vs. MUTABLE? (→ the
+  immutable-vs-mutable table in the Data Model, D9-adjacent).
 
 ==================================================
 MODULE: AGENT  (run for B and C)
@@ -121,45 +133,126 @@ G7 OBSERVABILITY, COST & RECOVERY — logging/tracing per run; token/spend monit
 ==================================================
 THEN — PRODUCE THE SPECIFICATION  (write it to {{SPEC_PATH}})
 ==================================================
-Generate the spec matching the archetype. It must be executable with zero
-clarifying questions — write for an EXECUTOR, not a stakeholder. End with an OPEN
-QUESTIONS & ASSUMPTIONS section listing every unresolved item + the default you are
-assuming. Then present the LOCK CHECK and wait for approval.
+Generate the spec matching the archetype. It must be executable with ZERO
+clarifying questions — write for an EXECUTOR (the build loop), not a stakeholder.
+
+--- ACTIONABLE-SPEC DEVICES (D1–D9 — REQUIRED in EVERY archetype) ---
+These are what make a spec loop-BUILDABLE instead of a wish-list. A spec that
+reads well but omits these still forces the loop to guess. Every spec MUST carry
+all nine, slotted into the archetype outline below. Terse and testable beats prose.
+
+D1 STATUS HEADER — first block of the doc: name · version (start v1.0) · archetype
+   (A/B/C) · status (DRAFT until LOCK → FROZEN after) · date · owner. The loop reads
+   status to know the spec is settled and safe to build against.
+D2 ENGINEERING PRINCIPLES / PRIORITY LADDER — an ORDERED tiebreaker list (e.g.
+   correctness > data integrity > security > simplicity > speed). At any design fork
+   mid-build the loop resolves BY this ladder instead of guessing or pausing.
+D3 NON-GOALS — an explicit "this is NOT / will NOT do (yet)" list. Scope firewall:
+   stops the loop gold-plating deferred scope.
+D4 INVARIANTS — named, numbered, non-negotiable rules (INV1, INV2 …), each ONE line,
+   testable, phrased MUST/NEVER (the exemplar's "Sacred Rule" + "FW1/FW2/FW3"). Core
+   security/permission boundaries live here as invariants. Reference them inline by
+   ID wherever a requirement depends on one ("…enforcing INV3"). The loop may never
+   optimize an invariant away; violating one is an automatic VERIFY fail.
+D5 DEFINITION OF DONE — per phase AND for v1, a CHECKBOX list of concrete, testable
+   conditions ("[ ] seed loads ≥N rows", "[ ] unauthorized role gets 403, not just a
+   hidden button"). This IS the checklist the loop's VERIFY step and the adversarial
+   verifier assert against. If an item can't be tested, rewrite it until it can.
+D6 DEV TASK LIST — atomic, numbered tasks (T1, T2 …), each ≈ one PR / one ROADMAP
+   row. Per task: one-line goal · the FR/INV it satisfies (cross-ref by ID) · its
+   acceptance test · any blocker (missing cred / DB migration / external decision).
+   /loop-roadmap turns these into rows — keep the mapping 1:1.
+D7 SEED DATASET — the concrete first REAL data to load (entities, rough counts, a few
+   sample records or where they come from). Kills the "tests green but zero artifacts"
+   failure: VERIFY loads this and asserts rows>0 / artifact present. (For B/C this is
+   the eval fixtures / seed scenarios.)
+D8 DEFERRED / RFC BACKLOG — good ideas explicitly PARKED for later, kept SEPARATE
+   from Open Questions. Open Questions = unresolved (must be blocker-free at LOCK);
+   Backlog = resolved-as-"not now". Keeps ideas without bleeding scope into v1.
+D9 CROSS-REFERENCES — FRs cite the INV/phase they belong to; tasks cite their FR;
+   DoD items cite the task/FR they close. A builder can always trace cause → effect.
 
 --- SYSTEM SPEC (archetype A) ---
-1. Executive Summary  2. Personas & User Journeys  3. Functional Requirements
-(numbered, testable, MoSCoW)  4. System Architecture (+ ASCII diagram)
-5. Data Model  6. API Contracts  7. UX Spec (screen-by-screen with states)
-8. Security & Permissions (role matrix)  9. Non-Functional Requirements
-10. Deployment & Infrastructure  11. Build Plan (phased milestones + dependencies)
-12. Open Questions & Assumptions
+0. Status Header [D1]
+1. Engineering Principles & Priority Ladder [D2]
+2. Executive Summary & Mission
+3. Non-Goals [D3]
+4. Invariants — INV# MUST/NEVER rules, incl. core security/permission boundaries [D4]
+5. Personas & User Journeys
+6. Functional Requirements (FR#, testable, MoSCoW; each cross-ref'd to its INV/phase [D9])
+7. System Architecture (+ ASCII diagram)
+8. Data Model (+ an IMMUTABLE vs. MUTABLE table)
+9. API Contracts
+10. UX Spec (screen-by-screen with states)
+11. Security & Permissions (role matrix — expands the INVs from §4)
+12. Non-Functional Requirements
+13. Deployment & Infrastructure
+14. Seed Dataset [D7]
+15. Build Plan — phased milestones + dependencies + a per-phase Definition of Done
+    checklist [D5]; state explicitly "nothing in a later phase blocks an earlier one"
+16. Dev Task List [D6] (T#; each maps to a Build-Plan phase and a future ROADMAP row)
+17. Ownership & Testing Gate (one owner per subsystem; the command that gates "done")
+18. Open Questions & Assumptions (no build-blockers may remain at LOCK)
+19. Deferred / RFC Backlog [D8]
 
 --- AGENT SPEC (archetype C) ---
-1. Executive Summary  2. Agent Purpose & Accountability  3. Autonomy Model &
-Guardrails (do-without-approval vs. human gates; never-do list)  4. Orchestration
-Topology (+ diagram)  5. Tool & Capability Inventory (contracts, scopes, costs)
-6. Instruction Architecture (system prompts, decision rules, versioning)
-7. Memory & State Design  8. Eval Suite & Success Criteria (scenarios, metrics,
-regression set, acceptance bar)  9. Observability, Cost Controls & Recovery
-10. Deployment & Runtime  11. Build Plan (phased milestones + dependencies)
-12. Open Questions & Assumptions
+0. Status Header [D1]
+1. Engineering Principles & Priority Ladder [D2]
+2. Executive Summary & Agent Purpose & Accountability
+3. Non-Goals [D3]
+4. Invariants & Guardrails — INV# do-without-approval / human-gate / NEVER-do rules
+   (the autonomy model expressed as named, testable constraints) [D4]
+5. Orchestration Topology (+ diagram)
+6. Tool & Capability Inventory (contracts, scopes, costs)
+7. Instruction Architecture (system prompts, decision rules, versioning)
+8. Memory & State Design
+9. Eval Suite & Success Criteria (scenarios, metrics, regression set, acceptance bar)
+   — this is the agent's Definition of Done [D5]
+10. Eval Fixtures / Seed Scenarios [D7] — the concrete cases VERIFY replays
+11. Observability, Cost Controls & Recovery
+12. Deployment & Runtime
+13. Build Plan — phased + per-phase DoD (eval pass-rate bar) [D5]; nothing later
+    blocks earlier
+14. Dev Task List [D6]
+15. Ownership & Testing Gate
+16. Open Questions & Assumptions
+17. Deferred / RFC Backlog [D8]
 
 --- HYBRID SPEC (archetype B) ---
-Merge both: sections 1–10 of the System Spec for the PLATFORM layer, PLUS an
-"Agent Layer" block containing sections 2–9 of the Agent Spec, PLUS an explicit
-INTEGRATION CONTRACT — exactly how the agent layer reads from / writes to / is
-governed by the system layer (shared data, permission boundary, where the agent
-acts, where humans intervene). One single Build Plan sequencing both layers.
+Merge both: the System Spec sections for the PLATFORM layer, PLUS an "Agent Layer"
+block containing the Agent Spec's §4–§11, PLUS an explicit INTEGRATION CONTRACT —
+exactly how the agent layer reads from / writes to / is governed by the system layer
+(shared data, permission boundary, where the agent acts, where humans intervene).
+Devices D1–D9 appear ONCE across the merged doc (one Status Header, one Priority
+Ladder, one Invariants list spanning both layers, one Non-Goals, one Seed Dataset,
+one Dev Task List, one Backlog). ONE single Build Plan — with per-phase DoD [D5] —
+sequencing both layers.
 
 ==================================================
 LOCK CHECK  (the loop's spec gate — do not exit without it)
 ==================================================
 List remaining OPEN QUESTIONS + the assumed defaults. Confirm Open Questions
-contains only accepted defaults, no build-blockers. Confirm the Build Plan is
-present (the DO phase needs sequencing) and — for B/C — that the Eval Suite is
-defined so "done" is measurable, not vibes. Then wait for an explicit "LOCK".
-On LOCK: the spec at {{SPEC_PATH}} is the single source of truth for the build.
-Mid-build ambiguity later = a SPEC DEFECT → return here, amend, re-lock, resume.
+contains only accepted defaults, no build-blockers. Then confirm the ACTIONABLE
+DEVICES are actually present and usable — this is the difference between a spec
+that reads well and one the loop can build unattended:
+  [ ] D1 Status Header present (still DRAFT — flip to FROZEN on LOCK).
+  [ ] D2 Priority Ladder is ORDERED (resolves a real tradeoff, not generic values).
+  [ ] D3 Non-Goals list present.
+  [ ] D4 Invariants numbered (INV#), each testable, and referenced inline by the FRs
+      that depend on them.
+  [ ] D5 Definition of Done checklists exist PER PHASE and every item is testable
+      (no "works well" — each maps to a command / status code / row count).
+  [ ] D6 Dev Task List (T#) present; each task cites its FR/INV and has an acceptance
+      test — so /loop-roadmap can emit rows 1:1.
+  [ ] D7 Seed Dataset (or eval fixtures for B/C) is concrete enough that VERIFY can
+      load it and assert rows>0 / artifact present.
+  [ ] Build Plan present and sequenced; for B/C the Eval Suite defines the acceptance
+      bar so "done" is measurable, not vibes.
+If any box fails, the spec is NOT lockable — close it before offering LOCK. Then
+wait for an explicit "LOCK".
+On LOCK: flip the Status Header (D1) to FROZEN with today's date. The spec at
+{{SPEC_PATH}} is the single source of truth for the build. Mid-build ambiguity later
+= a SPEC DEFECT → return here, amend, bump the version, re-lock (re-FREEZE), resume.
 
 ==================================================
 OVERLAY — NON-TECHNICAL CLIENT MODE  (use only when interviewing a non-engineer)

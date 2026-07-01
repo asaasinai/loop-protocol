@@ -19,7 +19,11 @@ Files you OWN (do not touch anything else): {{OWNED_FILES}}
    ToolSearch first). Do not stub what the spec says to make real.
 
 ## Acceptance (the criteria your tests must encode)
-{{ACCEPTANCE_CRITERIA}}
+{{ACCEPTANCE_CRITERIA}}   (the spec's Definition-of-Done items for this task, if any)
+
+## Invariants you must NOT break (the spec's INV# for this module)
+{{INVARIANTS}}   (non-negotiable — your tests should also prove these hold; the
+orchestrator's verifier fails the whole row on any violation.)
 
 ## Gate — run these and PASTE the tail of each before returning
 - {{TEST_CMD}}   (all green — full suite, not just your file)

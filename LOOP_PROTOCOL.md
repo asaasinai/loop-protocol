@@ -30,6 +30,15 @@ review.
    `/loop-spec <proj>`. This is the only place the loop is allowed to ask; once the
    spec is settled it is autonomous. For B/C the **Eval Suite** is the acceptance
    gate — "done" = the eval pass-rate, not "it ran once."
+   A spec is only *loop-buildable* if it carries the **actionable devices (D1–D9)**:
+   a Status Header (DRAFT→FROZEN), an ordered **Priority Ladder** (resolves design
+   forks by rule, so the loop never guesses), **Non-Goals** (scope firewall),
+   numbered **Invariants (INV#)** it may never optimize away, per-phase **Definition
+   of Done** checkboxes (the exact list VERIFY asserts against), an atomic **Dev Task
+   List (T#)** that maps 1:1 to roadmap rows, a concrete **Seed Dataset**, and a
+   **Deferred/RFC Backlog** kept apart from Open Questions. The LOCK CHECK refuses to
+   lock a spec missing these — a spec that reads well but omits them still forces the
+   loop to guess.
 1. **Roadmap = source of truth.** A `ROADMAP.md` table in the repo. The loop owns
    the `Status` column (`todo · in_progress · done · blocked · failed`). One row =
    one tight, testable spec = one PR. Opus's first job is to say *no* to scope creep.
@@ -189,14 +198,19 @@ read-only system (blocked); real outbound
 You are an ADVERSARIAL spec-verifier. REFUTE that this is done; default every
 criterion to FAIL until you have first-hand evidence. Trust only what you run/read.
 WHAT WAS BUILT: <one line>.
-CRITERIA (numbered, testable — paste them): <FRs / acceptance>.
+CRITERIA (numbered, testable — paste them): <the phase's Definition of Done
+checklist [D5], else FRs / acceptance>.
+INVARIANTS (paste the INV# this row touches): <INV#>. A violated invariant = the row
+is NOT done even if every criterion passes.
 EXERCISE IT: run <test cmd> + <build cmd> (exit 0); run/curl <route/page/seed+query>,
 auth as <…>; inspect the real artifact <file/rows/URL/status>.
 RULES: per criterion return PASS or FAIL + evidence (output, file:line, HTTP code);
 no evidence → FAIL. Verify migrations applied, routes return the demanded codes
 (e.g. unauthorized → 403, not just hidden), pages render LIVE data. Probe the
-negative space — does the gate BLOCK or only hide? Don't trust the builder or a log.
-RETURN: `criterion | PASS/FAIL | evidence`, then a GAPS section of every FAIL.
+negative space — does the gate BLOCK or only hide? Try to break each invariant.
+Don't trust the builder or a log.
+RETURN: `criterion | PASS/FAIL | evidence`, then `INV# | HELD/VIOLATED | evidence`,
+then a GAPS section of every FAIL/VIOLATED.
 ```
 
 ## Prompt 3 — the 360 capstone review
@@ -243,10 +257,12 @@ criterion you could NOT meet — honesty about a gap beats a false "complete".
 
 ## Spec-driven variant (for products with a PRD)
 
-When the project has a real spec (a PRD with numbered FRs per epic), the roadmap
-rows map to spec epics, each row's acceptance IS its epic's FR list, and the
-**adversarial spec-verifier (Prompt 2) is mandatory** for the row to count as done
-(use opus for security/compliance epics). Keep a `LOOP_LOG.md` ledger (one line per
+When the project has a real spec (from the spec engine, or any PRD with numbered
+FRs), the roadmap rows map 1:1 to the spec's **Dev Tasks (T#)**, each row's acceptance
+IS that task's **Definition of Done** checklist (falling back to its FR list), the
+row also carries the **INV#** it must uphold, and the **adversarial spec-verifier
+(Prompt 2) is mandatory** for the row to count as done — passing the DoD AND holding
+every listed invariant (use opus for security/compliance epics). Keep a `LOOP_LOG.md` ledger (one line per
 phase: FRs passed, sha, notes) and treat the PRD's rollout section as the scope
 oracle for the eventual 360. This is exactly how a 12-phase HIPAA build shipped end
 to end with per-phase FR conformance.

@@ -8,8 +8,15 @@ run and read.
 
 ## The contract (paste the exact acceptance criteria — numbered)
 {{ACCEPTANCE_CRITERIA}}
-  (e.g. the numbered FRs from the spec/PRD epic, or the row's "Goal / acceptance".
-   Each must be testable. If a criterion is vague, treat it as FAIL — "unprovable".)
+  (Prefer the spec's per-phase DEFINITION OF DONE checklist [D5] verbatim — it is
+   already testable. Otherwise the numbered FRs from the spec epic, or the row's
+   "Goal / acceptance". Each must be testable; a vague criterion is FAIL — "unprovable".)
+
+## Invariants that must NOT be violated (paste the relevant INV# from the spec)
+{{INVARIANTS}}
+  (The spec's INV# rules this work touches. An invariant violation is an AUTOMATIC
+   FAIL of the whole row even if every acceptance criterion passes — the loop may
+   never optimize an invariant away. Try to break each one.)
 
 ## How to exercise the build (give the verifier real handles)
 - Run: {{TEST_CMD}}  (full suite + the new tests)  and  {{BUILD_CMD}} (must exit 0)
@@ -29,6 +36,8 @@ run and read.
   and at runtime.
 
 ## Return
-A list `criterion-id | PASS/FAIL | evidence`, then a "GAPS" section naming every
-FAIL with what's missing. If everything is PASS, say so explicitly with the
-evidence that earned it.
+A list `criterion-id | PASS/FAIL | evidence`, then an `INV# | HELD/VIOLATED |
+evidence` line for each invariant, then a "GAPS" section naming every FAIL /
+VIOLATED with what's missing. Any VIOLATED invariant = the row is NOT done
+regardless of criteria. If everything is PASS and every invariant HELD, say so
+explicitly with the evidence that earned it.
