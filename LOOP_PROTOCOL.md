@@ -33,8 +33,8 @@ review.
 1. **Roadmap = source of truth.** A `ROADMAP.md` table in the repo. The loop owns
    the `Status` column (`todo · in_progress · done · blocked · failed`). One row =
    one tight, testable spec = one PR. Opus's first job is to say *no* to scope creep.
-2. **Spec with Opus, build with Sonnet.** The orchestrator (Opus) plans + verifies;
-   delegated subagents (Sonnet) implement one module each, test-first.
+2. **Spec with Opus, build with Sonnet 5.** The orchestrator (Opus) plans + verifies;
+   delegated subagents (Sonnet 5, model `claude-sonnet-5`) implement one module each, test-first.
 3. **Isolation via git worktrees.** Each project's loop runs in its own worktree on
    its own branch — that's what lets N loops run in parallel without colliding. Use
    worktree isolation *within* a project only when parallel subagents touch
@@ -134,7 +134,7 @@ recorded failed; apply known gotchas upfront). Then claim the first non-terminal
 row — files, the exact tests, any tools to call, and the REAL artifact it must
 produce. The spec is the whole handoff; the builder sees none of your context.
 
-DO (delegate to Sonnet): spawn a subagent with the spec verbatim (see Prompt 4).
+DO (delegate to Sonnet 5 — Agent tool, model `claude-sonnet-5`): spawn a subagent with the spec verbatim (see Prompt 4).
 Failing tests first, then code to pass them, nothing outside the spec. It returns
 diff + test output + artifact paths.
 

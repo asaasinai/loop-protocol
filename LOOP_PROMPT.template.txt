@@ -101,7 +101,7 @@ Code rows still go through the strict TDD gate below.
   the build subagent sees none of your context, only what you write.
 
 # DO  (delegate to Sonnet — do NOT build inline yourself)
-- Spawn a subagent (Agent tool, model "sonnet") with the spec verbatim.
+- Spawn a subagent (Agent tool, model "claude-sonnet-5") with the spec verbatim.
   Test-first: write the failing tests, then the code to pass them, nothing
   outside the spec. If the row needs a tool (data fetch, asset gen, API call),
   the builder uses it (load MCP/web schemas via ToolSearch). It returns the
@@ -144,14 +144,14 @@ Code rows still go through the strict TDD gate below.
 - If the artifact can't be produced (missing data/cred) → row "blocked", note
   why, move on.
 - SPEC-DRIVEN rows (a row mapped to numbered acceptance criteria / FRs from a
-  spec): also run an ADVERSARIAL spec-verifier — spawn a subagent (sonnet; opus
+  spec): also run an ADVERSARIAL spec-verifier — spawn a subagent (claude-sonnet-5; opus
   for security/compliance criteria) with ~/playbooks/VERIFIER_PROMPT.template.txt:
   paste the criteria + how to exercise the build; it returns PASS/FAIL+evidence
   per criterion, defaulting to FAIL. Any FAIL → fix the gap, re-verify, until the
   whole list is PASS. This is the gate for anything with a real spec behind it.
 - DESIGN-SLOP rows (a row producing a PUBLIC marketing / landing / portfolio /
   brand surface — NOT a dashboard, data table, or admin/product UI): also run the
-  anti-slop PRE-FLIGHT as an acceptance gate. Spawn a subagent (sonnet) with the
+  anti-slop PRE-FLIGHT as an acceptance gate. Spawn a subagent (claude-sonnet-5) with the
   mechanical checklist at ~/.openclaw/skills/taste-skill/SKILL.md (Section 14 FINAL
   PRE-FLIGHT CHECK; the full ruleset is the rest of that file) + the rendered output
   (the built HTML and, if you can capture them, screenshots): it returns each box
